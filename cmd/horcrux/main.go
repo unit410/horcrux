@@ -14,6 +14,7 @@ func main() {
 	subcommands.Register(subcommands.HelpCommand(), "")
 	subcommands.Register(&cmd.SplitArgs{}, "")
 	subcommands.Register(&cmd.RestoreArgs{}, "")
+	subcommands.Register(&cmd.DecryptArgs{}, "")
 
 	flag.Parse()
 	ctx := context.Background()
