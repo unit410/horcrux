@@ -51,7 +51,7 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	cleartextRecord := internal.Record{}
 
 	jsonBytes, err := ioutil.ReadFile(shareFileName)
-	assert(err)
+	internal.Assert(err)
 
 	var record internal.Record
 	json.Unmarshal(jsonBytes, &record)
@@ -64,7 +64,7 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	}
 
 	// ask gpg to decrypt the share files
-	share := decryptPayload(record.Payload, record.Pubkey)
+	share := internal.DecryptPayload(record.Payload, record.Pubkey)
 	if share == nil {
 		log.Fatal("Failed to decrypt.")
 	}
@@ -72,14 +72,14 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	cleartextRecord.Payload = share
 
 	cleartextRecordJSONBytes, err := json.Marshal(&cleartextRecord)
-	assert(err)
+	internal.Assert(err)
 
 	// if output is not defined, we output to stdout
 	if args.output == "" {
 		fmt.Printf("%s", cleartextRecordJSONBytes)
 	} else {
 		err = ioutil.WriteFile(args.output, cleartextRecordJSONBytes, 0644)
-		assert(err)
+		internal.Assert(err)
 	}
 
 	return subcommands.ExitSuccess

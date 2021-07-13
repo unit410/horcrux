@@ -106,7 +106,7 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 	var entities []*openpgp.Entity
 	if len(args.gpgKeyDir) > 0 {
 		files, err := ioutil.ReadDir(args.gpgKeyDir)
-		assert(err)
+		internal.Assert(err)
 
 		// read armored file and store into entites array
 		// the size of this array will be the number of shares
@@ -122,14 +122,14 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 			// we import into gpg for use with encryption
 			cmd := exec.Command("gpg", "--import", keyringFilename)
 			_, err := cmd.CombinedOutput()
-			assert(err)
+			internal.Assert(err)
 
 			keyringReader, err := os.Open(keyringFilename)
-			assert(err)
+			internal.Assert(err)
 			defer keyringReader.Close()
 
 			entityList, err := openpgp.ReadArmoredKeyRing(keyringReader)
-			assert(err)
+			internal.Assert(err)
 
 			keyringReader.Close()
 			entities = append(entities, entityList...)
@@ -148,12 +148,12 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 	// break the file into n shares
 	log.Printf("Fracturing into %d shares requiring %d to assemble\n", numShares, args.threshold)
 	original, err := ioutil.ReadFile(filename)
-	assert(err)
+	internal.Assert(err)
 
 	checksum := crc32.ChecksumIEEE(original)
 
 	shares, err := shamir.Split(original, numShares, args.threshold)
-	assert(err)
+	internal.Assert(err)
 
 	if !internal.CheckAllCombinations(original, shares, args.threshold) {
 		log.Fatal("Combination permutation check failed")
@@ -193,18 +193,18 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 			cmd.Stdout = &encBuf
 			cmd.Stdin = bytes.NewBuffer(outputPart.Payload)
 			err = cmd.Run()
-			assert(err)
+			internal.Assert(err)
 
 			outputPart.Payload = encBuf.Bytes()
 		}
 
 		jsonBytes, err := json.Marshal(&outputPart)
-		assert(err)
+		internal.Assert(err)
 
 		// idx + 1 to start the count at 1
 		partFilename := fmt.Sprintf("%s.%d.json", basename, idx+1)
 		err = ioutil.WriteFile(partFilename, jsonBytes, 0644)
-		assert(err)
+		internal.Assert(err)
 		log.Printf("Wrote %s\n", partFilename)
 	}
 
