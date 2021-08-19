@@ -6,117 +6,121 @@ import (
 	"gitlab.com/polychainlabs/vault-shamir/shamir"
 )
 
-func TestCheckAllCombinations(test *testing.T) {
-	// 2 of 2
-	{
-		original := []byte{3, 7, 9}
-		numParts := 2
-		threshold := 2
-		parts, err := shamir.Split(original, numParts, threshold)
-		if err != nil {
-			test.Fatal(err)
-		}
+type args struct {
+	original  []byte
+	parts     [][]byte
+	threshold int
+}
 
-		if !CheckAllCombinations(original, parts, 2) {
-			test.Fatal("Check combinations failed - expected pass")
-		}
+var original = []byte{3, 7, 9}
 
-		// editing any part should fail check combinations
+func TestCheckAllCombinations(t *testing.T) {
+	tests := []struct {
+		name     string
+		args     args
+		shim     func([][]byte) [][]byte
+		expected bool
+	}{
 		{
-			old := parts[0][0]
-			parts[0][0] = 1
-			if CheckAllCombinations(original, parts, 2) {
-				test.Fatal("Check combinations passed - expected fail")
-			}
-			parts[0][0] = old
-		}
-
-		if !CheckAllCombinations(original, parts, 2) {
-			test.Fatal("Check combinations failed - expected pass")
-		}
-
+			"base 2/2",
+			getArgs(t, original, 2, 2),
+			func(i [][]byte) [][]byte {
+				return i
+			},
+			true,
+		},
 		{
-			old := parts[1][0]
-			parts[1][0] = 1
-			if CheckAllCombinations(original, parts, 2) {
-				test.Fatal("Check combinations passed - expected fail")
-			}
-			parts[1][0] = old
-		}
+			"edited index 0 2/2",
+			getArgs(t, original, 2, 2),
+			func(i [][]byte) [][]byte {
+				i[0][0] = 1
+				return i
+			},
+			false,
+		},
+		{
+			"edited index 1 2/2",
+			getArgs(t, original, 2, 2),
+			func(i [][]byte) [][]byte {
+				i[1][0] = 1
+				return i
+			},
+			false,
+		},
+		{
+			"base 2/3",
+			getArgs(t, original, 3, 2),
+			func(i [][]byte) [][]byte {
+				return i
+			},
+			true,
+		},
+		{
+			"2/3 split with 3 given",
+			args{original: original, parts: nil, threshold: 3},
+			func(i [][]byte) [][]byte {
+				ret, _ := shamir.Split(original, 3, 2)
+				return ret
+			},
+			true,
+		},
+		{
+			"edited index 0 2/3",
+			getArgs(t, original, 3, 2),
+			func(i [][]byte) [][]byte {
+				i[0][0] = 1
+				return i
+			},
+			false,
+		},
+		{
+			"edited index 1 2/3",
+			getArgs(t, original, 3, 2),
+			func(i [][]byte) [][]byte {
+				i[1][0] = 1
+				return i
+			},
+			false,
+		},
+		{
+			"edited index 2 2/3",
+			getArgs(t, original, 3, 2),
+			func(i [][]byte) [][]byte {
+				i[2][0] = 1
+				return i
+			},
+			false,
+		},
+		{
+			"below threshold",
+			args{original: original, parts: nil, threshold: 2},
+			func(i [][]byte) [][]byte {
+				ret, _ := shamir.Split(original, 3, 3)
+				return ret
+			},
+			false,
+		},
 	}
-
-	// split into 2 of 3
-	{
-		original := []byte{3, 7, 9}
-		numParts := 3
-		threshold := 2
-		parts, err := shamir.Split(original, numParts, threshold)
-		if err != nil {
-			test.Fatal(err)
-		}
-
-		// all sets of 2 combinations should pass
-		if !CheckAllCombinations(original, parts, 2) {
-			test.Fatal("Check combinations failed - expected pass")
-		}
-
-		// all sets of 3 combinations should also pass
-		if !CheckAllCombinations(original, parts, 3) {
-			test.Fatal("Check combinations failed - expected pass")
-		}
-
-		// editing any part should fail check combinations even tho only two parts are needed
-		{
-			old := parts[0][0]
-			parts[0][0] = 1
-			if CheckAllCombinations(original, parts, 2) {
-				test.Fatal("Check combinations passed - expected fail")
+	for _, tt := range tests {
+		tt.args.parts = tt.shim(tt.args.parts)
+		t.Run(tt.name, func(t *testing.T) {
+			if actual := CheckAllCombinations(tt.args.original, tt.args.parts, tt.args.threshold); actual != tt.expected {
+				t.Errorf("CheckAllCombinations() = %v, expected %v", actual, tt.expected)
 			}
-			parts[0][0] = old
-		}
-
-		if !CheckAllCombinations(original, parts, 2) {
-			test.Fatal("Check combinations failed - expected pass")
-		}
-
-		{
-			old := parts[1][0]
-			parts[1][0] = 1
-			if CheckAllCombinations(original, parts, 2) {
-				test.Fatal("Check combinations passed - expected fail")
-			}
-			parts[1][0] = old
-		}
-
-		if !CheckAllCombinations(original, parts, 2) {
-			test.Fatal("Check combinations failed - expected pass")
-		}
-
-		{
-			old := parts[2][0]
-			parts[2][0] = 1
-			if CheckAllCombinations(original, parts, 2) {
-				test.Fatal("Check combinations passed - expected fail")
-			}
-			parts[2][0] = old
-		}
+		})
 	}
 }
 
-func TestCheckAllCombinations_fail(test *testing.T) {
-	// 3 of 3
-	{
-		original := []byte{3, 7, 9}
-		numParts := 3
-		threshold := 3
-		parts, err := shamir.Split(original, numParts, threshold)
-		if err != nil {
-			test.Fatal(err)
-		}
+// getArgs builds expected args and error if shamir.Split fails
+func getArgs(t *testing.T, original []byte, parts int, threshold int) args {
+	split, err := shamir.Split(original, parts, threshold)
+	if err != nil {
+		t.Errorf("could not shamir split %s into %d/%d parts: %s", original, threshold, parts, err)
+	}
 
-		// should not pass because we specified to check only 2 part combinations
-		if CheckAllCombinations(original, parts, 2) {
-			test.Fatal("Check combinations passed - expected fail")
-		}
+	return args{
+		original:  original,
+		parts:     split,
+		threshold: threshold,
 	}
 }
