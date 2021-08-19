@@ -1,8 +1,8 @@
 package internal
 
-// A record stores a single share and accompanying metadata
+// Record stores a single share and accompanying metadata
 type Record struct {
-	// The required number of shares to complete a successful restore
+	// Threshold is the required number of shares to complete a successful restore
 	Threshold int
 	// If set, contains the gpg public key used to encrypt the payload
 	Pubkey []byte
