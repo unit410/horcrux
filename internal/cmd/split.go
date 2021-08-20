@@ -22,20 +22,20 @@ import (
 	"horcrux/internal"
 )
 
-/// Arguments for the `split` command
+// SplitArgs models arguments for the `split` command
 type SplitArgs struct {
 	numShares int
 	threshold int
 	gpgKeyDir string
 }
 
-/// Split command Name
+// Name of the `split` command
 func (*SplitArgs) Name() string { return "split" }
 
-/// Split command synopsis (short summary)
+// Synopsis of the `split` command
 func (*SplitArgs) Synopsis() string { return "shamir split a file" }
 
-/// Split command full usage
+// Usage of the `split` command
 func (*SplitArgs) Usage() string {
 	return `split [options] <file.ext>
 
@@ -53,14 +53,14 @@ func (*SplitArgs) Usage() string {
 `
 }
 
-/// Initialize flag reading for split command
+// SetFlags initializes split command flags
 func (args *SplitArgs) SetFlags(flagSet *flag.FlagSet) {
 	flagSet.IntVar(&args.numShares, "num-shares", 0, "Total number of shares (The 'n' in 'k of n')")
 	flagSet.IntVar(&args.threshold, "threshold", 2, "Required parts to reconstruct (The 'k' of 'k of n')")
 	flagSet.StringVar(&args.gpgKeyDir, "gpg-keys", "", "Directory with .asc files of public keys")
 }
 
-// Serialize the public part of the given Entity to w, excluding signatures from other entities
+// serializeWithoutSigs serializes the public part of the given Entity to w, excluding signatures from other entities
 func serializeWithoutSigs(entity *openpgp.Entity, w io.Writer) error {
 	err := entity.PrimaryKey.Serialize(w)
 	if err != nil {
@@ -89,7 +89,7 @@ func serializeWithoutSigs(entity *openpgp.Entity, w io.Writer) error {
 	return nil
 }
 
-/// Run the split command
+// Execute runs the split command
 func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	remaining := flagSet.Args()
 	if len(remaining) <= 0 {

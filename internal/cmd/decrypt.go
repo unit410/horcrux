@@ -12,18 +12,18 @@ import (
 	"github.com/google/subcommands"
 )
 
-/// Decrypt command line arguments
+// DecryptArgs models command line arguments for the `decrypt` command
 type DecryptArgs struct {
 	output string
 }
 
-/// Decrypt command name
+// Name of the decrypt command
 func (*DecryptArgs) Name() string { return "decrypt" }
 
-/// Short summary for the decrypt command
+// Synopsis of the decrypt command
 func (*DecryptArgs) Synopsis() string { return "decrypt a share file that was encryted with a gpg key" }
 
-/// Full usage for the decrypt command
+// Usage for the decrypt command
 func (*DecryptArgs) Usage() string {
 	return `decrypt <share file>
 
@@ -35,12 +35,12 @@ func (*DecryptArgs) Usage() string {
 `
 }
 
-/// Initialze decrypt command flags
+// SetFlags initializes decrypt command flags
 func (args *DecryptArgs) SetFlags(flagSet *flag.FlagSet) {
 	flagSet.StringVar(&args.output, "output", "", "Output to this file (default: stdout)")
 }
 
-/// Run the decrypt command
+// Execute runs the decrypt command
 func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	shareFiles := flagSet.Args()
 	if len(shareFiles) != 1 {

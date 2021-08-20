@@ -14,18 +14,18 @@ import (
 	"gitlab.com/polychainlabs/vault-shamir/shamir"
 )
 
-/// Restore command line arguments
+// RestoreArgs models command line arguments for the `restore` command
 type RestoreArgs struct {
 	output string
 }
 
-/// Restore command name
+// Name of the restore command
 func (*RestoreArgs) Name() string { return "restore" }
 
-/// Short summary for the restore command
+// Synopsis of the restore command
 func (*RestoreArgs) Synopsis() string { return "restore a file from shamir shares" }
 
-/// Full usage for the restore command
+// Usage of the restore command
 func (*RestoreArgs) Usage() string {
 	return `restore <share file> <share file> <share file>
 
@@ -38,12 +38,12 @@ func (*RestoreArgs) Usage() string {
 `
 }
 
-/// Initialze restore command flags
+// SetFlags initializes restore command flags
 func (args *RestoreArgs) SetFlags(flagSet *flag.FlagSet) {
 	flagSet.StringVar(&args.output, "output", "", "Output to this file (default: stdout)")
 }
 
-/// Run the restore command
+// Execute runs the restore command
 func (args *RestoreArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	shareFiles := flagSet.Args()
 	if len(shareFiles) < 2 {
