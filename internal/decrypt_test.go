@@ -5,7 +5,7 @@ import "testing"
 func Test_getEmailFromSmartcard(t *testing.T) {
 	tests := []struct {
 		name     string
-		input 	 []byte
+		input    []byte
 		expected string
 	}{
 		{"present", []byte("<foo@example.com>"), "foo@example.com"},

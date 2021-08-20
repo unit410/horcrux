@@ -64,7 +64,7 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 		stdout, err := cmd.Output()
 		if err != nil {
 			log.Printf("%s\n", stderr.String())
-			retry := AskForConfirmation(os.Stdin,"Failed to decrypt share. Retry?")
+			retry := AskForConfirmation(os.Stdin, "Failed to decrypt share. Retry?")
 			if !retry {
 				break
 			}
