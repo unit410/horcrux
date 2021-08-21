@@ -48,9 +48,9 @@ func TestAskForConfirmation(t *testing.T) {
 		prompt string
 	}
 	tests := []struct {
-		name string
-		args args
-		want bool
+		name     string
+		args     args
+		expected bool
 	}{
 		{"yes",
 			args{source: strings.NewReader("yes\n")},
@@ -79,8 +79,8 @@ func TestAskForConfirmation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := AskForConfirmation(tt.args.source, tt.args.prompt); got != tt.want {
-				t.Errorf("AskForConfirmation() = %v, expected %v", got, tt.want)
+			if actual := AskForConfirmation(tt.args.source, tt.args.prompt); actual != tt.expected {
+				t.Errorf("AskForConfirmation() = %v, expected %v", actual, tt.expected)
 			}
 		})
 	}
