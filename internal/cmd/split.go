@@ -124,14 +124,7 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 			_, err := cmd.CombinedOutput()
 			internal.Assert(err)
 
-			keyringReader, err := os.Open(keyringFilename)
-			internal.Assert(err)
-			defer keyringReader.Close()
-
-			entityList, err := openpgp.ReadArmoredKeyRing(keyringReader)
-			internal.Assert(err)
-
-			keyringReader.Close()
+			entityList := getEntityListFromFile(keyringFilename)
 			entities = append(entities, entityList...)
 		}
 
@@ -209,4 +202,15 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 	}
 
 	return subcommands.ExitSuccess
+}
+
+// getEntityListFromFile returns EntityList after reading it from the armor keyring file
+func getEntityListFromFile(keyringFilename string) openpgp.EntityList {
+	keyringReader, err := os.Open(keyringFilename)
+	internal.Assert(err)
+	defer keyringReader.Close()
+
+	entityList, err := openpgp.ReadArmoredKeyRing(keyringReader)
+	internal.Assert(err)
+	return entityList
 }
