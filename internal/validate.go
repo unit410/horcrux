@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log"
 
-	"gitlab.com/polychainlabs/vault-shamir/shamir"
+	"gitlab.com/unit410/vault-shamir/shamir"
 )
 
 func combinationRecurse(original []byte, parts [][]byte, tmp [][]byte, start int, end int, idx int, r int) bool {

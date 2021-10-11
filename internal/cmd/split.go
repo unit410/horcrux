@@ -16,7 +16,7 @@ import (
 	"strings"
 
 	"github.com/google/subcommands"
-	"gitlab.com/polychainlabs/vault-shamir/shamir"
+	"gitlab.com/unit410/vault-shamir/shamir"
 	"golang.org/x/crypto/openpgp"
 
 	"horcrux/internal"

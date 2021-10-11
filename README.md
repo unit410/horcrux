@@ -2,7 +2,7 @@
 
 _Cut my life into pieces. This is my last restore. ~Abraham Lincoln_
 
-Horcrux is a command line tool that uses [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing) to split a file into `n` encrypted parts, requiring `m` of those parts to later reconstruct. Horcrux is a usability layer built around Hashicorp Vault's [shamirs code](https://gitlab.com/polychainlabs/vault-shamir).
+Horcrux is a command line tool that uses [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing) to split a file into `n` encrypted parts, requiring `m` of those parts to later reconstruct. Horcrux is a usability layer built around Hashicorp Vault's [shamirs code](https://gitlab.com/unit410/vault-shamir).
 
 ## Split
 

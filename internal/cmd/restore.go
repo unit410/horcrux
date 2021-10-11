@@ -11,7 +11,7 @@ import (
 	"log"
 
 	"github.com/google/subcommands"
-	"gitlab.com/polychainlabs/vault-shamir/shamir"
+	"gitlab.com/unit410/vault-shamir/shamir"
 )
 
 // RestoreArgs models command line arguments for the `restore` command

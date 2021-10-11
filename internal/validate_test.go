@@ -3,7 +3,7 @@ package internal
 import (
 	"testing"
 
-	"gitlab.com/polychainlabs/vault-shamir/shamir"
+	"gitlab.com/unit410/vault-shamir/shamir"
 )
 
 type args struct {
