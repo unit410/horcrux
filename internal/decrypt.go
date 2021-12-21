@@ -3,13 +3,14 @@ package internal
 import (
 	"bytes"
 	"fmt"
-	"golang.org/x/crypto/openpgp"
-	"golang.org/x/crypto/openpgp/packet"
 	"log"
 	"os"
 	"os/exec"
 	"regexp"
 	"time"
+
+	"golang.org/x/crypto/openpgp"
+	"golang.org/x/crypto/openpgp/packet"
 )
 
 // DecryptPayload decrypts and returns the payload encrypted to pubkey
@@ -25,8 +26,8 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 	identities := make([]string, 0, len(entity.Identities))
 	for _, value := range entity.Identities {
 		userId := value.UserId
-		log.Printf("%s\n", userId.Name)
-		log.Printf("%s\n", userId.Email)
+		log.Printf("Name: %s\n", userId.Name)
+		log.Printf("Email: %s\n", userId.Email)
 		identities = append(identities, userId.Email)
 	}
 
@@ -41,7 +42,7 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 	log.Printf("Waiting for the above identity's smartcard to be inserted")
 
 	for {
-		fmt.Print(".")
+		fmt.Fprintf(os.Stderr, ".")
 		time.Sleep(300 * time.Millisecond)
 		cmd := exec.Command("gpg", "--card-status")
 		stdout, stderr := cmd.Output()
@@ -84,6 +85,20 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 // associated with the given smart card.
 func getEmailFromSmartcard(input []byte) string {
 	out := string(input)
+
+	// Canonical Form
 	re := regexp.MustCompile(`[\<^](.*?)[\^>]`)
-	return re.FindStringSubmatch(out)[1]
+	matches := re.FindStringSubmatch(out)
+	if len(matches) >= 2 {
+		return matches[1]
+	}
+	// Fallback to Cardholder Name
+	re = regexp.MustCompile(`Name of cardholder:\s+(.*)`)
+	matches = re.FindStringSubmatch(out)
+	if len(matches) >= 2 {
+		log.Println("Warning: Could not find a canonical email, using full name as email")
+		return matches[1]
+	}
+	log.Println("Warning: Could not find an email associated with smartcard")
+	return ""
 }
