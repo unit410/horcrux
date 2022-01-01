@@ -1,0 +1,32 @@
+#! /usr/bin/env bash
+
+set -e 
+
+if [ $# -ne 1 ]; then
+    echo 'Create keys to test with'
+    echo ''
+    echo 'Usage: keygen <key_id>'
+    echo '  e.g. keygen 1'
+    exit 1
+fi
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+key_name="test-${1?}@example.com"
+
+pubkey_file="${dir}/public/$key_name.pub.asc"
+secret_file="${dir}/secret/$key_name.pem.asc"
+
+if [ -f "$pubkey_file" ] || [ -f "$secret_file" ]; then 
+    echo barf
+fi
+
+
+if ! output=$(gpg --logger-fd 1 --batch --passphrase "" --quick-generate-key "$key_name" rsa4096 sign,encrypt never); then
+    echo "Could not create secret key"
+    echo "$output"
+    exit 1
+fi
+
+gpg --armor --export "$key_name"            > "$pubkey_file"
+gpg --armor --export-secret-key "$key_name" > "$secret_file"
