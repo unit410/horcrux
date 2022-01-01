@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"hash/crc32"
 	"io/ioutil"
-	"log"
 	"os/exec"
 	"path"
 	"strings"
@@ -33,7 +32,7 @@ func Split(filename string, numShares int, threshold int, gpgKeyDir string) erro
 			}
 
 			keyFile := path.Join(gpgKeyDir, file.Name())
-			log.Printf("importing key %s\n", keyFile)
+			logf("importing key %s\n", keyFile)
 
 			// we import into gpg for use with encryption
 			cmd := exec.Command("gpg", "--import", keyFile)
@@ -45,9 +44,9 @@ func Split(filename string, numShares int, threshold int, gpgKeyDir string) erro
 		}
 
 		for _, entity := range entities {
-			log.Printf("Identity: %x\n", entity.PrimaryKey.Fingerprint[:])
+			logf("Identity: %x\n", entity.PrimaryKey.Fingerprint[:])
 			for _, value := range entity.Identities {
-				log.Printf("    %s\n", value.Name)
+				logf("    %s\n", value.Name)
 			}
 		}
 
@@ -55,7 +54,7 @@ func Split(filename string, numShares int, threshold int, gpgKeyDir string) erro
 	}
 
 	// break the file into n shares
-	log.Printf("Fracturing into %d shares requiring %d to assemble\n", numShares, threshold)
+	logf("Fracturing into %d shares requiring %d to assemble\n", numShares, threshold)
 	original, err := ioutil.ReadFile(filename)
 	Assert(err)
 
@@ -114,7 +113,7 @@ func Split(filename string, numShares int, threshold int, gpgKeyDir string) erro
 		partFilename := fmt.Sprintf("%s.%d.json", basename, idx+1)
 		err = ioutil.WriteFile(partFilename, jsonBytes, 0644)
 		Assert(err)
-		log.Printf("Wrote %s\n", partFilename)
+		logf("Wrote %s\n", partFilename)
 	}
 
 	return nil

@@ -29,7 +29,7 @@ func Contains(s []string, str string) bool {
 func AskForConfirmation(source io.Reader, prompt string) bool {
 	reader := bufio.NewReader(source)
 
-	log.Printf("%s [y/N]: ", prompt)
+	logf("%s [y/N]: ", prompt)
 
 	response, err := reader.ReadString('\n')
 	Assert(err)

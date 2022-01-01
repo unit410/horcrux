@@ -3,7 +3,6 @@ package horcrux
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -21,13 +20,13 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 
 	fingerprint := entity.PrimaryKey.Fingerprint
 
-	log.Printf("----------------------------------------------------------------\n")
-	log.Printf("%X\n", fingerprint)
+	logf("----------------------------------------------------------------\n")
+	logf("%X\n", fingerprint)
 	identities := make([]string, 0, len(entity.Identities))
 	for _, value := range entity.Identities {
 		userId := value.UserId
-		log.Printf("Name: %s\n", userId.Name)
-		log.Printf("Email: %s\n", userId.Email)
+		logf("Name: %s\n", userId.Name)
+		logf("Email: %s\n", userId.Email)
 		identities = append(identities, userId.Email)
 	}
 
@@ -39,7 +38,7 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 		Assert(err)
 	}
 
-	log.Printf("Waiting for the above identity's smartcard to be inserted")
+	logf("Waiting for the above identity's smartcard to be inserted")
 
 	for {
 		fmt.Fprintf(os.Stderr, ".")
@@ -48,7 +47,7 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 		stdout, stderr := cmd.Output()
 		if stderr == nil {
 			if Contains(identities, getEmailFromSmartcard(stdout)) {
-				log.Printf("\nSmartcard detected...\n")
+				logf("\nSmartcard detected...\n")
 				break
 			}
 		}
@@ -56,7 +55,7 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 
 	for {
 		// ask gpg to decrypt the file
-		log.Printf("Decrypting %x share...\n", fingerprint)
+		logf("Decrypting %x share...\n", fingerprint)
 		cmd := exec.Command("gpg", "--decrypt")
 
 		var stderr bytes.Buffer
@@ -64,7 +63,7 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 		cmd.Stderr = &stderr
 		stdout, err := cmd.Output()
 		if err != nil {
-			log.Printf("%s\n", stderr.String())
+			logf("%s\n", stderr.String())
 			retry := AskForConfirmation(os.Stdin, "Failed to decrypt share. Retry?")
 			if !retry {
 				break
@@ -74,7 +73,7 @@ func DecryptPayload(payload []byte, pubkey []byte) (share []byte) {
 			continue
 		}
 
-		log.Printf("%x share decrypted with size %d\n", fingerprint, len(stdout))
+		logf("%x share decrypted with size %d\n", fingerprint, len(stdout))
 		return stdout
 	}
 
@@ -96,9 +95,9 @@ func getEmailFromSmartcard(input []byte) string {
 	re = regexp.MustCompile(`Name of cardholder:\s+(.*)`)
 	matches = re.FindStringSubmatch(out)
 	if len(matches) >= 2 {
-		log.Println("Warning: Could not find a canonical email, using full name as email")
+		logln("Warning: Could not find a canonical email, using full name as email")
 		return matches[1]
 	}
-	log.Println("Warning: Could not find an email associated with smartcard")
+	logln("Warning: Could not find an email associated with smartcard")
 	return ""
 }

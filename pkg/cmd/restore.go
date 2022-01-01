@@ -6,7 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"hash/crc32"
-	"horcrux/internal"
+	"horcrux/pkg/horcrux"
 	"io/ioutil"
 	"log"
 
@@ -57,9 +57,9 @@ func (args *RestoreArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	// ask gpg to decrypt the share files
 	for _, shareFileName := range shareFiles {
 		jsonBytes, err := ioutil.ReadFile(shareFileName)
-		internal.Assert(err)
+		horcrux.Assert(err)
 
-		var record internal.Record
+		var record horcrux.Record
 		json.Unmarshal(jsonBytes, &record)
 
 		if record.Checksum != nil {
@@ -71,7 +71,7 @@ func (args *RestoreArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 		}
 
 		if len(record.Pubkey) > 0 {
-			share := internal.DecryptPayload(record.Payload, record.Pubkey)
+			share := horcrux.DecryptPayload(record.Payload, record.Pubkey)
 			if share == nil {
 				continue
 			}
@@ -82,7 +82,7 @@ func (args *RestoreArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	}
 
 	original, err := shamir.Combine(shares)
-	internal.Assert(err)
+	horcrux.Assert(err)
 
 	if checksum != nil && crc32.ChecksumIEEE(original) != *checksum {
 		log.Fatalf("Error: Checksum of assembled shares does not match original")
@@ -95,7 +95,7 @@ func (args *RestoreArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	}
 
 	err = ioutil.WriteFile(args.output, original, 0644)
-	internal.Assert(err)
+	horcrux.Assert(err)
 
 	return subcommands.ExitSuccess
 }
