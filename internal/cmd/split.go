@@ -116,15 +116,15 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 				continue
 			}
 
-			keyringFilename := path.Join(args.gpgKeyDir, file.Name())
-			log.Printf("importing key %s\n", keyringFilename)
+			keyFile := path.Join(args.gpgKeyDir, file.Name())
+			log.Printf("importing key %s\n", keyFile)
 
 			// we import into gpg for use with encryption
-			cmd := exec.Command("gpg", "--import", keyringFilename)
+			cmd := exec.Command("gpg", "--import", keyFile)
 			_, err := cmd.CombinedOutput()
 			internal.Assert(err)
 
-			entityList := getEntityListFromFile(keyringFilename)
+			entityList := getEntityListFromFile(keyFile)
 			entities = append(entities, entityList...)
 		}
 
@@ -205,8 +205,8 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 }
 
 // getEntityListFromFile returns EntityList after reading it from the armor keyring file
-func getEntityListFromFile(keyringFilename string) openpgp.EntityList {
-	keyringReader, err := os.Open(keyringFilename)
+func getEntityListFromFile(keyFile string) openpgp.EntityList {
+	keyringReader, err := os.Open(keyFile)
 	internal.Assert(err)
 	defer keyringReader.Close()
 
