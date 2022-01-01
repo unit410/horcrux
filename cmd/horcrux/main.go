@@ -5,7 +5,7 @@ import (
 	"flag"
 	"os"
 
-	"horcrux/internal/cmd"
+	"horcrux/pkg/cmd"
 
 	"github.com/google/subcommands"
 )

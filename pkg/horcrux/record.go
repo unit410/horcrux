@@ -1,4 +1,4 @@
-package internal
+package horcrux
 
 // Record stores a single share and accompanying metadata
 type Record struct {

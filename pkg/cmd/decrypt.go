@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"horcrux/internal"
+	"horcrux/pkg/horcrux"
 	"io/ioutil"
 	"log"
 
@@ -48,12 +48,12 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	}
 
 	shareFileName := shareFiles[0]
-	cleartextRecord := internal.Record{}
+	cleartextRecord := horcrux.Record{}
 
 	jsonBytes, err := ioutil.ReadFile(shareFileName)
-	internal.Assert(err)
+	horcrux.Assert(err)
 
-	var record internal.Record
+	var record horcrux.Record
 	json.Unmarshal(jsonBytes, &record)
 
 	cleartextRecord.Threshold = record.Threshold
@@ -64,7 +64,7 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	}
 
 	// ask gpg to decrypt the share files
-	share := internal.DecryptPayload(record.Payload, record.Pubkey)
+	share := horcrux.DecryptPayload(record.Payload, record.Pubkey)
 	if share == nil {
 		log.Fatal("Failed to decrypt.")
 	}
@@ -72,14 +72,14 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	cleartextRecord.Payload = share
 
 	cleartextRecordJSONBytes, err := json.Marshal(&cleartextRecord)
-	internal.Assert(err)
+	horcrux.Assert(err)
 
 	// if output is not defined, we output to stdout
 	if args.output == "" {
 		fmt.Printf("%s", cleartextRecordJSONBytes)
 	} else {
 		err = ioutil.WriteFile(args.output, cleartextRecordJSONBytes, 0644)
-		internal.Assert(err)
+		horcrux.Assert(err)
 	}
 
 	return subcommands.ExitSuccess
