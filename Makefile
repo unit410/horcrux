@@ -10,7 +10,11 @@ build/horcrux-darwin-arm64: cmd/horcrux/main.go $(wildcard internal/**/*.go)
 	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -o ./build/horcrux-darwin-arm64  ./cmd/horcrux
 
 test:
-	go test ./...
+	go test $$(go list ./... | grep -v /vendor/)
+
+coverage:
+	go test $$(go list ./... | grep -v /vendor/) -coverprofile cover.out
+	go tool cover -func cover.out
 
 clean:
 	rm -rf build

@@ -4,10 +4,15 @@ stages:
   - test
   - build
 
-unit_tests:
+test:
   stage: test
   script:
     - make test
+
+coverage:
+  stage: test
+  script:
+    - make coverage
 
 build:
   stage: build
