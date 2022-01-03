@@ -1,5 +1,7 @@
 package horcrux
 
+import "reflect"
+
 // Record stores a single share and accompanying metadata
 type Record struct {
 	// Threshold is the required number of shares to complete a successful restore
@@ -14,3 +16,12 @@ type Record struct {
 	// This allows the field to be ignored if not present.
 	Checksum *uint32
 }
+
+func (r *Record) PubkeyIsOmitted() bool {
+	return reflect.DeepEqual(r.Pubkey, []byte(omittedPubkeyMarker))
+}
+func (r *Record) OmitPubkey() {
+	r.Pubkey = []byte(omittedPubkeyMarker)
+}
+
+const omittedPubkeyMarker = "omitted"

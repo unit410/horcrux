@@ -18,7 +18,8 @@ func TestContains(t *testing.T) {
 		args     args
 		expected bool
 	}{
-		{"contains",
+		{
+			"contains",
 			args{s: baseSlice, str: "foo"},
 			true,
 		},
@@ -77,8 +78,10 @@ func TestAskForConfirmation(t *testing.T) {
 			false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			forceTerminal = true
 			if actual := AskForConfirmation(tt.args.source, tt.args.prompt); actual != tt.expected {
 				t.Errorf("AskForConfirmation() = %v, expected %v", actual, tt.expected)
 			}

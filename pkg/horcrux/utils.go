@@ -19,7 +19,6 @@ func Contains(s []string, str string) bool {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -27,6 +26,10 @@ func Contains(s []string, str string) bool {
 // Any other input will be considered as a No.
 // Return true if the user confirmed with a yes, false otherwise.
 func AskForConfirmation(source io.Reader, prompt string) bool {
+	// Fail by default if there is no terminal
+	if !stdoutIsTerminal() {
+		return false
+	}
 	reader := bufio.NewReader(source)
 
 	logf("%s [y/N]: ", prompt)

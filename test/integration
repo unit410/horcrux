@@ -1,0 +1,58 @@
+#! /usr/bin/env bash
+
+set -e 
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+"$dir/keygen" 1
+"$dir/keygen" 2
+"$dir/keygen" 3
+
+input_file="$dir/input"
+output_file="$dir/output"
+
+test-no-encryption() {
+    threshold=${1?}
+    num_shares=${2?}
+
+    echo -e "\nSplitting..."
+    go run  cmd/horcrux/main.go split \
+        --output-dir "$dir/shares" \
+        --threshold "$threshold" \
+        --num-shares "$num_shares" \
+        "$input_file" \
+
+    echo -e "\nRestoring..."
+    go run  cmd/horcrux/main.go restore \
+        --output "$output_file" \
+        "$dir"/shares/input.*.json
+        
+    diff "$output_file" "$input_file"
+    rm "$dir"/shares/input.*.json
+
+    echo "Test successful: $threshold/$num_shares"
+}
+
+## No Encryption ##
+test-no-encryption 2 5
+test-no-encryption 5 5
+
+## GPG Encryption ##
+# echo -e "\nSplitting..."
+# go run  cmd/horcrux/main.go split \
+#     --output-dir "$dir/shares" \
+#     --threshold 2 \
+#     --omit-pubkeys \
+#     "$input_file" \
+#     "$dir/public/"*pub*
+
+# jq . "$dir"/shares/input.1.json
+
+# echo -e "\nRestoring..."
+# go run  cmd/horcrux/main.go restore \
+#     --output "$output_file" \
+#     "$dir"/shares/input.*.json
+
+# diff "$output_file" "$input_file"
+
+echo -e "\nSplit and restore completed successfully"

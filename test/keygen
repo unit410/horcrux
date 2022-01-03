@@ -18,7 +18,8 @@ pubkey_file="${dir}/public/$key_name.pub.asc"
 secret_file="${dir}/secret/$key_name.pem.asc"
 
 if [ -f "$pubkey_file" ] || [ -f "$secret_file" ]; then 
-    echo barf
+    echo "$key_name already exists"
+    exit 0
 fi
 
 

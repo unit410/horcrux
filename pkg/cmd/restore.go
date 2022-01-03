@@ -2,16 +2,13 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"hash/crc32"
 	"horcrux/pkg/horcrux"
 	"io/ioutil"
 	"log"
 
 	"github.com/google/subcommands"
-	"gitlab.com/unit410/vault-shamir/shamir"
 )
 
 // RestoreArgs models command line arguments for the `restore` command
@@ -50,42 +47,9 @@ func (args *RestoreArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 		log.Fatal("At least two files are required to assemble from a fracture.")
 	}
 
-	// if any of the records have a checksum, we will compare it to a checksum of the aseembled shares
-	var checksum *uint32
-
-	var shares [][]byte
-	// ask gpg to decrypt the share files
-	for _, shareFileName := range shareFiles {
-		jsonBytes, err := ioutil.ReadFile(shareFileName)
-		horcrux.Assert(err)
-
-		var record horcrux.Record
-		json.Unmarshal(jsonBytes, &record)
-
-		if record.Checksum != nil {
-			checksum = record.Checksum
-		}
-
-		if record.Threshold != 0 && record.Threshold > len(shareFiles) {
-			log.Fatalf("Error: The threshold requires %d shares but only %d were provided.", record.Threshold, len(shareFiles))
-		}
-
-		if len(record.Pubkey) > 0 {
-			share := horcrux.DecryptPayload(record.Payload, record.Pubkey)
-			if share == nil {
-				continue
-			}
-			shares = append(shares, share)
-		} else {
-			shares = append(shares, record.Payload)
-		}
-	}
-
-	original, err := shamir.Combine(shares)
-	horcrux.Assert(err)
-
-	if checksum != nil && crc32.ChecksumIEEE(original) != *checksum {
-		log.Fatalf("Error: Checksum of assembled shares does not match original")
+	original, err := horcrux.Restore(shareFiles)
+	if err != nil {
+		log.Fatal("Unable to decrypt with error: ", err)
 	}
 
 	// if output is not defined, we output to stdout

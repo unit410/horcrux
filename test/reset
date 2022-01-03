@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+
+set -e
+
+gpg --delete-secret-key test-1@example.com || true
+gpg --delete-secret-key test-2@example.com || true
+gpg --delete-secret-key test-3@example.com || true
+
+gpg --delete-key test-1@example.com || true
+gpg --delete-key test-2@example.com || true
+gpg --delete-key test-3@example.com || true

@@ -11,9 +11,10 @@ import (
 
 // SplitArgs models arguments for the `split` command
 type SplitArgs struct {
-	numShares int
-	threshold int
-	gpgKeyDir string
+	numShares   int
+	threshold   int
+	outputDir   string
+	omitPubkeys bool
 }
 
 // Name of the `split` command
@@ -24,11 +25,9 @@ func (*SplitArgs) Synopsis() string { return "shamir split a file" }
 
 // Usage of the `split` command
 func (*SplitArgs) Usage() string {
-	return `split [options] <file.ext>
+	return `split [options] <file.ext> <gpg-recipient-pubkey-file>, (<gpg-recipient-pubkey-file>, ...)
 
-  Shamir split a file into shares.
-
-  The output share content will be written to files in the current working directory.
+  Shamir split a file into shares, optionally GPG encrypting to the given recipients.
 
     file.0.json
     file.1.json
@@ -42,9 +41,10 @@ func (*SplitArgs) Usage() string {
 
 // SetFlags initializes split command flags
 func (args *SplitArgs) SetFlags(flagSet *flag.FlagSet) {
-	flagSet.IntVar(&args.numShares, "num-shares", 0, "Total number of shares (The 'n' in 'k of n')")
-	flagSet.IntVar(&args.threshold, "threshold", 2, "Required parts to reconstruct (The 'k' of 'k of n')")
-	flagSet.StringVar(&args.gpgKeyDir, "gpg-keys", "", "Directory with .asc files of public keys")
+	flagSet.IntVar(&args.numShares, "num-shares", 0, "Total number of shares (The 'n' in 'm of n')")
+	flagSet.IntVar(&args.threshold, "threshold", 2, "Required parts to reconstruct (The 'm' of 'm of n')")
+	flagSet.BoolVar(&args.omitPubkeys, "omit-pubkeys", false, "Omit pubkeys from the output split")
+	flagSet.StringVar(&args.outputDir, "output-dir", ".", "Directory where shards should be output")
 }
 
 // Execute runs the split command
@@ -53,13 +53,26 @@ func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...in
 	if len(remaining) <= 0 {
 		log.Fatal("At least one file required to fracture.")
 	}
-	if len(args.gpgKeyDir) == 0 && args.numShares == 0 {
-		log.Fatal("One of --num-shares or --gpg-keys is required.")
-	}
 	filename := remaining[0]
-	err := horcrux.Split(filename, args.numShares, args.threshold, args.gpgKeyDir)
+	gpgRecipientFiles := remaining[1:]
+
+	// Validate input
+	gpgRecipients := len(remaining) - 1
+	if args.numShares == 0 && gpgRecipients <= 1 {
+		log.Fatal("Either 2+ gpg recipients *or* --num-shares must be set")
+	}
+	if args.numShares > 0 && gpgRecipients > 0 {
+		log.Fatal("Cannot set both gpg recipients and --num-shares")
+	}
+
+	var err error
+	if args.numShares > 0 {
+		err = horcrux.Split(filename, args.numShares, args.threshold, args.outputDir)
+	} else {
+		err = horcrux.SplitEncrypt(filename, gpgRecipientFiles, args.threshold, args.outputDir, args.omitPubkeys)
+	}
 	if err != nil {
-		log.Fatal("Error!", err)
+		log.Fatal("Error:", err)
 	}
 	return subcommands.ExitSuccess
 }

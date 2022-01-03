@@ -64,7 +64,7 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	}
 
 	// ask gpg to decrypt the share files
-	share := horcrux.DecryptPayload(record.Payload, record.Pubkey)
+	share := record.Decrypt()
 	if share == nil {
 		log.Fatal("Failed to decrypt.")
 	}
