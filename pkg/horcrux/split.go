@@ -30,6 +30,10 @@ func Split(filename string, numShares int, threshold int, gpgKeyDir string) erro
 			if !file.Mode().IsRegular() {
 				continue
 			}
+			// Ignore dotfiles
+			if strings.HasPrefix(file.Name(), ".") {
+				continue
+			}
 
 			keyFile := path.Join(gpgKeyDir, file.Name())
 			logf("importing key %s\n", keyFile)
