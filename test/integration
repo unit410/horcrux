@@ -38,21 +38,20 @@ test-no-encryption 2 5
 test-no-encryption 5 5
 
 ## GPG Encryption ##
-# echo -e "\nSplitting..."
-# go run  cmd/horcrux/main.go split \
-#     --output-dir "$dir/shares" \
-#     --threshold 2 \
-#     --omit-pubkeys \
-#     "$input_file" \
-#     "$dir/public/"*pub*
+echo -e "\nSplitting..."
+go run  cmd/horcrux/main.go split \
+    --output-dir "$dir/shares" \
+    --threshold 2 \
+    "$input_file" \
+    "$dir/public/"*.pub.asc
 
-# jq . "$dir"/shares/input.1.json
+gpg --import "$dir/secret/"*.pem.asc
 
-# echo -e "\nRestoring..."
-# go run  cmd/horcrux/main.go restore \
-#     --output "$output_file" \
-#     "$dir"/shares/input.*.json
+echo -e "\nRestoring..."
+go run  cmd/horcrux/main.go restore \
+    --output "$output_file" \
+    "$dir"/shares/input.*.json
 
-# diff "$output_file" "$input_file"
+diff "$output_file" "$input_file"
 
 echo -e "\nSplit and restore completed successfully"
