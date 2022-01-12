@@ -5,8 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"horcrux/pkg/horcrux"
-	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/google/subcommands"
 )
@@ -58,7 +58,7 @@ func (args *RestoreArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 		return subcommands.ExitSuccess
 	}
 
-	err = ioutil.WriteFile(args.output, original, 0644)
+	err = os.WriteFile(args.output, original, 0644)
 	horcrux.Assert(err)
 
 	return subcommands.ExitSuccess

@@ -49,19 +49,19 @@ func (args *SplitArgs) SetFlags(flagSet *flag.FlagSet) {
 
 // Execute runs the split command
 func (args *SplitArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	remaining := flagSet.Args()
-	if len(remaining) <= 0 {
+	argv := flagSet.Args()
+	if len(argv) <= 0 {
 		log.Fatal("At least one file required to fracture.")
 	}
-	filename := remaining[0]
-	gpgRecipientFiles := remaining[1:]
+	filename := argv[0]
+	gpgRecipientFiles := argv[1:]
 
 	// Validate input
-	gpgRecipients := len(remaining) - 1
-	if args.numShares == 0 && gpgRecipients <= 1 {
+	numGpgRecipients := len(argv) - 1
+	if args.numShares == 0 && numGpgRecipients <= 1 {
 		log.Fatal("Either 2+ gpg recipients *or* --num-shares must be set")
 	}
-	if args.numShares > 0 && gpgRecipients > 0 {
+	if args.numShares > 0 && numGpgRecipients > 0 {
 		log.Fatal("Cannot set both gpg recipients and --num-shares")
 	}
 

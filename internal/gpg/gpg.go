@@ -148,13 +148,13 @@ func Decrypt(payload []byte) ([]byte, bytes.Buffer, error) {
 	return stdout, stderr, err
 }
 
-var fingerprintRegex = regexp.MustCompile(`[0-9a-fA-F]{16}`)
+var keyIDRegex = regexp.MustCompile(`[0-9a-fA-F]{16}`)
 
 func isValidKeyID(keyID string) bool {
 	if len(keyID) != 16 {
 		return false
 	}
-	loc := fingerprintRegex.FindStringIndex(keyID)
+	loc := keyIDRegex.FindStringIndex(keyID)
 	if len(loc) == 0 || loc[0] != 0 {
 		return false
 	}

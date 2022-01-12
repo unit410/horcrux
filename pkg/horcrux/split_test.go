@@ -1,7 +1,6 @@
 package horcrux
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -56,7 +55,7 @@ func TestSplit(t *testing.T) {
 	Assert(err)
 
 	// Restore it,
-	files, err := ioutil.ReadDir(shareDir)
+	files, err := os.ReadDir(shareDir)
 	fileNames := []string{}
 	for _, f := range files {
 		fileNames = append(fileNames, path.Join(shareDir, f.Name()))

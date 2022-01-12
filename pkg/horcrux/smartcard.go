@@ -31,6 +31,9 @@ func smartcardIsAttached() bool {
 	return stderr == nil
 }
 
+// Fingerprints are always 40 chars
+const gpgFingerprintLength = 40
+
 func parseSmartcardFingerprints(rawStdout []byte) []string {
 	stdout := string(rawStdout)
 	smartcardFingerprints := []string{}
@@ -41,8 +44,7 @@ func parseSmartcardFingerprints(rawStdout []byte) []string {
 		if strings.HasPrefix(line, "fpr:") {
 			components := strings.Split(line, ":")
 			for i, fp := range components {
-				// Fingerprints are 40 chars
-				if len(fp) == 40 {
+				if len(fp) == gpgFingerprintLength {
 					// Only exist in positoins 1, 2 or 3
 					// ref: https://helpful.wiki/gpg
 					if i == 1 || i == 2 || i == 3 {

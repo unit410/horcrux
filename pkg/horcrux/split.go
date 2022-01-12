@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"hash/crc32"
 	"horcrux/internal/gpg"
-	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"path"
 	"strings"
@@ -17,14 +17,14 @@ import (
 )
 
 func SplitEncrypt(filename string, gpgRecipientFiles []string, threshold int, outputDir string, omitPubkeys bool) error {
-	if threshold > len(gpgRecipientFiles) {
+	numShares := len(gpgRecipientFiles)
+	if threshold > numShares {
 		log.Fatal("Threshold cannot exceept number of shares")
 	}
-	if len(gpgRecipientFiles) < 2 {
+	if numShares < 2 {
 		log.Fatal("Must split to at 2+ recipients")
 	}
 
-	numShares := len(gpgRecipientFiles)
 	records, err := splitFile(filename, numShares, threshold)
 	if err != nil {
 		return err
@@ -84,7 +84,10 @@ func encryptRecords(records []Record, gpgRecipientFiles []string, omitPubkeys bo
 		}
 	}
 
-	for i, _ := range records {
+	if len(entities) != len(records) {
+		log.Fatalf("%d entities != %d records", len(entities), len(records))
+	}
+	for i := range records {
 		entity := entities[i]
 
 		// Serialize the pubkey so we can restore without needing to gather the gpg key files
@@ -120,7 +123,7 @@ func encryptRecords(records []Record, gpgRecipientFiles []string, omitPubkeys bo
 func splitFile(filename string, numShares int, threshold int) ([]Record, error) {
 	// break the file into n shares
 	logf("Fracturing into %d shares requiring %d to assemble\n", numShares, threshold)
-	original, err := ioutil.ReadFile(filename)
+	original, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +176,7 @@ func writeRecords(outputBase string, records []Record) error {
 		}
 
 		outputFile := fmt.Sprintf("%s.%d.json", outputBase, i+1)
-		err = ioutil.WriteFile(outputFile, jsonBytes, 0644)
+		err = os.WriteFile(outputFile, jsonBytes, 0644)
 		if err != nil {
 			return err
 		}

@@ -6,8 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"horcrux/pkg/horcrux"
-	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/google/subcommands"
 )
@@ -50,7 +50,7 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	shareFileName := shareFiles[0]
 	cleartextRecord := horcrux.Record{}
 
-	jsonBytes, err := ioutil.ReadFile(shareFileName)
+	jsonBytes, err := os.ReadFile(shareFileName)
 	horcrux.Assert(err)
 
 	var record horcrux.Record
@@ -78,7 +78,7 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	if args.output == "" {
 		fmt.Printf("%s", cleartextRecordJSONBytes)
 	} else {
-		err = ioutil.WriteFile(args.output, cleartextRecordJSONBytes, 0644)
+		err = os.WriteFile(args.output, cleartextRecordJSONBytes, 0644)
 		horcrux.Assert(err)
 	}
 

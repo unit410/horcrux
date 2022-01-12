@@ -3,20 +3,21 @@ package horcrux
 import (
 	"encoding/json"
 	"hash/crc32"
-	"io/ioutil"
 	"log"
+	"os"
 
 	"gitlab.com/unit410/vault-shamir/shamir"
 )
 
 func Restore(shareFiles []string) ([]byte, error) {
-	// if any of the records have a checksum, we will compare it to a checksum of the aseembled shares
+	// if any of the records have a checksum, we will compare it
+	// to a checksum of the assembled shares
 	var checksum *uint32
 
 	var shares [][]byte
 	// ask gpg to decrypt the share files
 	for _, shareFileName := range shareFiles {
-		jsonBytes, err := ioutil.ReadFile(shareFileName)
+		jsonBytes, err := os.ReadFile(shareFileName)
 		if err != nil {
 			return nil, err
 		}
