@@ -17,6 +17,7 @@ build/horcrux-darwin-arm64:
 
 build-release: clean lint
 	docker run --rm \
+		--platform "linux/amd64" \
 		--volume $(mkfile_dir):/build \
 		--workdir /build \
 		$(build_image) \
