@@ -1,6 +1,6 @@
 # ![Horcrux Logo](logo.png)
 
-![pipeline status](https://gitlab.com/u4hq/horcrux/badges/master/pipeline.svg) ![coverage](https://gitlab.com/u4hq/horcrux/badges/master/coverage.svg)
+![pipeline status](https://gitlab.com/u4hq/horcrux/badges/main/pipeline.svg) ![coverage](https://gitlab.com/u4hq/horcrux/badges/main/coverage.svg)
 
 Horcrux is a command line tool that uses [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing) to split a file into `n` encrypted parts, requiring `m` of those parts to later reconstruct. Horcrux is a usability layer built around Hashicorp Vault's [shamirs code](https://github.com/hashicorp/vault/tree/main/shamir) which is vendored [here](https://gitlab.com/unit410/vault-shamir).
 
