@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"sort"
 	"strings"
 
 	"gitlab.com/unit410/vault-shamir/shamir"
@@ -24,6 +25,12 @@ func SplitEncrypt(filename string, gpgRecipientFiles []string, threshold int, ou
 	if numShares < 2 {
 		log.Fatal("Must split to at 2+ recipients")
 	}
+
+	// Naturally sort recipient files so recipients look like
+	// 1, 2, 3, ... 10, 11
+	// *not*
+	// 1, 10, 11, 2
+	sort.Sort(NaturalSort(gpgRecipientFiles))
 
 	records, err := splitFile(filename, numShares, threshold)
 	if err != nil {
