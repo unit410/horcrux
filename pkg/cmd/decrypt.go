@@ -54,7 +54,9 @@ func (args *DecryptArgs) Execute(_ context.Context, flagSet *flag.FlagSet, _ ...
 	horcrux.Assert(err)
 
 	var record horcrux.Record
-	json.Unmarshal(jsonBytes, &record)
+	if err := json.Unmarshal(jsonBytes, &record); err != nil {
+		log.Fatalf("Error unmarshalling json bytes: %s", err)
+	}
 
 	cleartextRecord.Threshold = record.Threshold
 	cleartextRecord.Checksum = record.Checksum

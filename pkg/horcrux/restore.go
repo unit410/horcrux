@@ -23,7 +23,9 @@ func Restore(shareFiles []string) ([]byte, error) {
 		}
 
 		var record Record
-		json.Unmarshal(jsonBytes, &record)
+		if err := json.Unmarshal(jsonBytes, &record); err != nil {
+			log.Fatalf("Error unmarshalling json bytes: %s", err)
+		}
 
 		if record.Checksum != nil {
 			checksum = record.Checksum

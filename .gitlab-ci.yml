@@ -4,10 +4,10 @@ stages:
   - test
   - build
 
-test:
+lint:
   stage: test
   script:
-    - make test
+    - make lint
 
 coverage:
   stage: test

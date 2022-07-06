@@ -23,6 +23,19 @@ build-release: clean lint
 		$(build_image) \
 		make build
 
+deps-dev:
+	go install github.com/kisielk/errcheck@latest
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+
+lint: deps-dev
+	go mod verify
+	go vet $$(go list ./... | grep -v /vendor/)
+	go fmt $$(go list ./... | grep -v /vendor/)
+	@echo "\nError Checking:"
+	errcheck --exclude .errcheck ./...
+	@echo "\nStatic Checking:"
+	staticcheck ./...
+
 test: lint
 	go test $$(go list ./... | grep -v /vendor/)
 
@@ -33,10 +46,6 @@ coverage:
 integration:
 	./test/integration
 
-lint:
-	go mod verify
-	go vet $$(go list ./... | grep -v /vendor/)
-	go fmt $$(go list ./... | grep -v /vendor/)
 
 clean:
 	rm -rf build

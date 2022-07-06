@@ -11,7 +11,9 @@ import (
 	"regexp"
 	"strings"
 
+	//lint:ignore SA1019 though this package is unmaintained, security fixes are still applied and it works for our needs
 	"golang.org/x/crypto/openpgp"
+	//lint:ignore SA1019 though this package is unmaintained, security fixes are still applied and it works for our needs
 	"golang.org/x/crypto/openpgp/packet"
 )
 
