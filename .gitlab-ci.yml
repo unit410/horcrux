@@ -12,7 +12,15 @@ lint:
 coverage:
   stage: test
   script:
+    - go install github.com/boumenot/gocover-cobertura@latest
     - make coverage
+    - gocover-cobertura < cover.out > cover.xml
+  coverage: '/total:.*\d+.\d+%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cover.xml
 
 integration:
   stage: test
@@ -21,5 +29,6 @@ integration:
 
 build:
   stage: build
+  needs: []
   script:
     - make

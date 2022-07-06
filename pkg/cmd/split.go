@@ -44,7 +44,7 @@ func (args *SplitArgs) SetFlags(flagSet *flag.FlagSet) {
 	flagSet.IntVar(&args.numShares, "num-shares", 0, "Total number of shares (The 'n' in 'm of n')")
 	flagSet.IntVar(&args.threshold, "threshold", 2, "Required parts to reconstruct (The 'm' of 'm of n')")
 	flagSet.BoolVar(&args.omitPubkeys, "omit-pubkeys", false, "Omit pubkeys from the output split")
-	flagSet.StringVar(&args.outputDir, "output-dir", ".", "Directory where shards should be output")
+	flagSet.StringVar(&args.outputDir, "output-dir", ".", "Directory where shares should be output")
 }
 
 // Execute runs the split command

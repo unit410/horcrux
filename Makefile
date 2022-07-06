@@ -40,7 +40,7 @@ test: lint
 	go test $$(go list ./... | grep -v /vendor/)
 
 coverage:
-	go test $$(go list ./... | grep -v /vendor/) -coverprofile cover.out
+	go test $$(go list ./... | grep -v /vendor/) -coverprofile cover.out -covermode count
 	go tool cover -func cover.out
 
 integration:
